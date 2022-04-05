@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "368646351103",
+    "project_id": "power-app-53a05",
+    "storage_bucket": "power-app-53a05.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:368646351103:android:cb7e5fc02ce88dae3644ca",
+        "android_client_info": {
+          "package_name": "com.example.wpam_power_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "368646351103-ikkscsapgkng4q0om3mh77f0lq8mg0ql.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3O-vc_zIek2BTBmCuU3wVXfTbHvcq_kA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "368646351103-ikkscsapgkng4q0om3mh77f0lq8mg0ql.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

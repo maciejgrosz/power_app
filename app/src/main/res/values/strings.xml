@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Form</string>
+    <string name="first_name">First name</string>
+    <string name="last_name">Last name</string>
+    <string name="body_weight">Body Weight</string>
+    <string name="height">Height</string>
+    <string name="done">Done</string>
+    <string name="photo">Photo</string>
+    <string name="save">Save profile</string>
+    <string name="cancel">Cancel</string>
+    <string name="new_profile">Add new profile</string>
+</resources>
