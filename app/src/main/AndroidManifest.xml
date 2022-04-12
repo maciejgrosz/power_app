@@ -10,7 +10,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WPAM_power_app">
         <activity
-            android:name=".Register"
+            android:name=".StartScreen"
+            android:exported="false"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name=".Profiles"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,19 +24,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Login"
-            android:exported="false" />
-        <activity
-            android:name=".Profiles"
-            android:exported="false" />
-        <activity
             android:name=".Form"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:exported="false">
         </activity>
     </application>
 

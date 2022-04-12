@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Form</string>
+    <string name="app_name">Power App</string>
     <string name="first_name">First name</string>
     <string name="last_name">Last name</string>
     <string name="body_weight">Body Weight</string>
@@ -9,4 +9,14 @@
     <string name="save">Save profile</string>
     <string name="cancel">Cancel</string>
     <string name="new_profile">Add new profile</string>
+    <string name="password">Password</string>
+    <string name="e_mail">Email</string>
+    <string name="tag">version: 2137</string>
+    <string name="login">login</string>
+    <string name="swipe_left_for_register">swipe left for register</string>
+    <string name="register">Register</string>
+    <string name="your_name">Your name</string>
+    <string name="re_type_password">Repeat password</string>
+    <string name="swipe_right_for_login">Swipe right for login</string>
+    <string name="logout">Logout</string>
 </resources>
