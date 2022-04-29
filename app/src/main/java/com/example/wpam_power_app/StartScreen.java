@@ -33,10 +33,6 @@ public class StartScreen extends AppCompatActivity {
         adapter.addFragment(new LoginFragment());
         adapter.addFragment(new RegisterFragment());
         sampleViewPager.setAdapter(adapter);
-
-
-
-
     }
 
 

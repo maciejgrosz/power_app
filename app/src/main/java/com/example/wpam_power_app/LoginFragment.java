@@ -22,7 +22,7 @@ import com.google.firebase.auth.FirebaseAuth;
 public class LoginFragment extends Fragment {
     private FirebaseAuth mAuth;
     private EditText login_email, login_password, reg_email, reg_password, pass_reapeted;
-    private Button registerbtn;
+    private Button loginbtn;
 
     public LoginFragment() {
         // Required empty public constructor
@@ -36,7 +36,7 @@ public class LoginFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         login_email = view.findViewById(R.id.et_email);
         login_password = view.findViewById(R.id.et_password);
-        Button loginbtn = (Button) view.findViewById(R.id.btn_login);
+        loginbtn = view.findViewById(R.id.btn_login);
 
         loginbtn.setOnClickListener(new View.OnClickListener() {
             @Override
