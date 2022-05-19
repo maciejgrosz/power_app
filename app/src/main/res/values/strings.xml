@@ -19,4 +19,12 @@
     <string name="re_type_password">Repeat password</string>
     <string name="swipe_right_for_login">Swipe right for login</string>
     <string name="logout">Logout</string>
+    <string name="formName">Name:</string>
+    <string name="formSurname">Surname:</string>
+    <string name="formWeight">Weight:</string>
+    <string name="formHeight">Height:</string>
+    <string name="formStart">Start</string>
+    <string name="formEdit">Edit</string>
+    <string name="formDelete">Delete</string>
+    <string name="Delete">Delete</string>
 </resources>

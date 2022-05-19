@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,23 +17,34 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class Form extends AppCompatActivity {
+public class EditForm extends AppCompatActivity {
     private EditText mName, mSurname, mWeight, mHeight;
     private FirebaseDatabase db = FirebaseDatabase.getInstance("https://power-app-53a05-default-rtdb.europe-west1.firebasedatabase.app/");
     private DatabaseReference root = db.getReference();
+    private String name, surname, weight, height;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_form);
         Button cancel_form_btn = findViewById(R.id.cancel_form_btn);
-        Button saveFormBtn = findViewById(R.id.btnSaveForm);
-        int id = getIntent().getIntExtra("id",999);
+        Button editFormBtn = findViewById(R.id.btnSaveForm);
+        editFormBtn.setText("Edit profile");
+        ProfileModel Profile = (ProfileModel) getIntent().getSerializableExtra("Profile");
+        int id = getIntent().getIntExtra("id",0);
+        name = Profile.getName();
+        surname = Profile.getSurname();
+        weight = Profile.getWeight();
+        height = Profile.getHeight();
 
         mName = findViewById(R.id.etFirstName);
+        mName.setText(name);
         mSurname = findViewById(R.id.etLastName);
+        mSurname.setText(surname);
         mWeight = findViewById(R.id.etWeight);
+        mWeight.setText(weight);
         mHeight = findViewById(R.id.etHeight);
+        mHeight.setText(height);
 
         cancel_form_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -43,16 +53,16 @@ public class Form extends AppCompatActivity {
             }
         });
 
-        saveFormBtn.setOnClickListener(new View.OnClickListener() {
+        editFormBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String name = mName.getText().toString();
-                String surname = mSurname.getText().toString();
-                String weight = mWeight.getText().toString();
-                String height = mHeight.getText().toString();
+                String new_name = mName.getText().toString();
+                String new_surname = mSurname.getText().toString();
+                String new_weight = mWeight.getText().toString();
+                String new_height = mHeight.getText().toString();
                 String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                ProfileModel profile = new ProfileModel(name, surname, weight, height);
-                saveFormToDB(uid, profile, id);
+                ProfileModel profile = new ProfileModel(new_name, new_surname, new_weight, new_height);
+                updateFormToDB(uid, profile, id);
             }
         });
     }
@@ -63,11 +73,10 @@ public class Form extends AppCompatActivity {
 
     }
 
-    public void saveFormToDB(String userID, ProfileModel profile, int id){
-        root.child("users").child(userID).child(String.format("Profile_%d", id)).setValue(profile);
+    public void updateFormToDB(String userID, ProfileModel profile, int id){
+
+        root.child("users").child(userID).child(String.format("Profile_%d",id)).setValue(profile);
         Intent intent = new Intent(this, Profiles.class);
         startActivity(intent);
-
-
     }
 }

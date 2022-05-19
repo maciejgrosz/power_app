@@ -10,6 +10,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -26,21 +28,26 @@ public class Profiles extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseDatabase database;
     private DatabaseReference reference;
-    private Button btnlogout, add_new_profile_btn;
+    private Button btnlogout, add_new_profile_btn, btnDeleteProfile, btnEditProfile;
     private ListView profilesList;
-    private ArrayList<String> profilesNames = new ArrayList<>();
+    private ArrayList<ProfileModel> profiles = new ArrayList<ProfileModel>();
     private String uid;
     private FirebaseUser currentUser;
+    private RadioButton isSelected;
+    private int listViewPosition;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profiles);
-
+        listViewPosition = -1;
         mAuth = FirebaseAuth.getInstance();
         btnlogout = findViewById(R.id.logout_btn);
+        btnDeleteProfile = findViewById(R.id.btnDeleteProfile);
+        btnEditProfile = findViewById(R.id.btnEditProfile);
         currentUser = mAuth.getCurrentUser();
         database = FirebaseDatabase.getInstance("https://power-app-53a05-default-rtdb.europe-west1.firebasedatabase.app");
-        final ArrayAdapter<String> adapter=new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, profilesNames);
+        final ProfileAdapter adapter=new ProfileAdapter(this, 0, profiles);
 
         mAuth.addAuthStateListener(new FirebaseAuth.AuthStateListener() {
             @Override
@@ -65,18 +72,31 @@ public class Profiles extends AppCompatActivity {
                         }
                     });
 
+                    btnDeleteProfile.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            delete(adapter, reference);
+                        }
+                    });
+
+                    btnEditProfile.setOnClickListener(new View.OnClickListener(){
+                        @Override
+                        public void onClick(View view){editForm();}
+                    });
                     profilesList = (ListView) findViewById(R.id.profile_list);
                     profilesList.setAdapter(adapter);
                     profilesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
-                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                            openMainPage();
+                        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                            listViewPosition = position;
                         }
+
                     });
+//                    Is it necessary?
                     reference.addChildEventListener(new ChildEventListener() {
                         @Override
                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                            profilesNames.add(getProfileName(dataSnapshot));
+                            profiles.add(createProfile(dataSnapshot));
                             adapter.notifyDataSetChanged();
                         }
                         @Override
@@ -84,7 +104,7 @@ public class Profiles extends AppCompatActivity {
                         }
                         @Override
                         public void onChildRemoved(DataSnapshot dataSnapshot) {
-                            profilesNames.remove(getProfileName(dataSnapshot));
+                            profiles.remove(createProfile(dataSnapshot));
                             adapter.notifyDataSetChanged();
                         }
                         @Override
@@ -109,7 +129,22 @@ public class Profiles extends AppCompatActivity {
     }
 
     public void openForm() {
-        startActivity(new Intent(this, Form.class));
+        startActivity(new Intent(this, Form.class).putExtra("id", profiles.size()));
+    }
+
+    public void editForm(){
+        if(listViewPosition == -1){
+            Toast.makeText(this, "Please select an item", Toast.LENGTH_SHORT).show();
+        }
+        for (int i = 0; i < profiles.size(); i++) {
+            if (i == listViewPosition) {
+                Intent intent = new Intent(this, EditForm.class);
+                intent.putExtra("Profile", profiles.get(i));
+                intent.putExtra("id", i);
+                startActivity(intent);
+            }
+        }
+        listViewPosition = -1;
     }
 
     public void logout(){
@@ -117,16 +152,26 @@ public class Profiles extends AppCompatActivity {
         startActivity(new Intent(this, StartScreen.class));
     }
 
-    public String getProfileName(DataSnapshot dataSnapshot){
+    public void delete(ProfileAdapter adapter, DatabaseReference reference){
+        if(listViewPosition == -1){
+            Toast.makeText(this, "Please select an item", Toast.LENGTH_SHORT).show();
+        }
+        for (int i = 0; i < profiles.size(); i++) {
+            if (i == listViewPosition) {
+                reference.child(String.format("Profile_%d",i)).removeValue();
+                profiles.remove(i);
+            }
+            adapter.notifyDataSetChanged();
+        }
+        listViewPosition = -1;
+    }
+
+    public ProfileModel createProfile(DataSnapshot dataSnapshot){
         Map<String, Object> profileData = (Map<String, Object>) dataSnapshot.getValue();
         String surname = (String) profileData.get("surname");
         String name = (String) profileData.get("name");
         String weight = (String) profileData.get("weight");
         String height = (String) profileData.get("height");
-        return String.format("Surname: %s\nName: %s\nWeight: %s kg\nHeight: %s cm", surname, name, weight, height);
-    }
-
-    public void openMainPage(){
-        startActivity(new Intent(this, Form.class));
+        return new ProfileModel(name, surname, weight, height);
     }
 }
