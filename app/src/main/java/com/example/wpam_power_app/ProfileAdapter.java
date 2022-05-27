@@ -49,23 +49,6 @@ public class ProfileAdapter extends ArrayAdapter<ProfileModel> {
         tvSurname.setText(String.format("Surname: %s",profile.getSurname()));
         tvWeight.setText(String.format("Weight: %s", profile.getWeight()));
         tvHeight.setText(String.format("Height: %s", profile.getHeight()));
-//        Button deleteBtn = (Button) convertView.findViewById(R.id.buttonDelete);
-//        Button editBtn = (Button) convertView.findViewById(R.id.buttonEdit);
-//        Button startBtn = (Button) convertView.findViewById(R.id.buttonStart);
-//
-//        deleteBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-////                profileList.remove(profile);
-//                String a = profile.getSurname()+profile.getWeight();
-//                DatabaseReference deleteRef = root.child(uid).child(a);
-//                deleteRef.removeValue();
-//
-//
-//                notifyDataSetChanged();
-//            }
-//        });
         return convertView;
     }
 }

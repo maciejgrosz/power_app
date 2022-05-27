@@ -10,10 +10,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WPAM_power_app">
         <activity
+            android:name=".App"
+            android:exported="false" />
+        <activity
             android:name=".StartScreen"
             android:exported="false"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".Profiles"
             android:exported="true">
@@ -25,12 +27,10 @@
         </activity>
         <activity
             android:name=".Form"
-            android:exported="false">
-        </activity>
+            android:exported="false"></activity>
         <activity
             android:name=".EditForm"
-            android:exported="false">
-        </activity>
+            android:exported="false"></activity>
     </application>
 
 </manifest>

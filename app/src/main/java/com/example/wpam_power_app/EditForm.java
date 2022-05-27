@@ -27,7 +27,7 @@ public class EditForm extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_form);
-        Button cancel_form_btn = findViewById(R.id.cancel_form_btn);
+        Button cancelFormBtn = findViewById(R.id.cancel_form_btn);
         Button editFormBtn = findViewById(R.id.btnSaveForm);
         editFormBtn.setText("Edit profile");
         ProfileModel Profile = (ProfileModel) getIntent().getSerializableExtra("Profile");
@@ -46,7 +46,7 @@ public class EditForm extends AppCompatActivity {
         mHeight = findViewById(R.id.etHeight);
         mHeight.setText(height);
 
-        cancel_form_btn.setOnClickListener(new View.OnClickListener() {
+        cancelFormBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 cancelForm();

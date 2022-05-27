@@ -28,7 +28,7 @@ public class Profiles extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseDatabase database;
     private DatabaseReference reference;
-    private Button btnlogout, add_new_profile_btn, btnDeleteProfile, btnEditProfile;
+    private Button btnlogout, add_new_profile_btn, btnDeleteProfile, btnEditProfile, btnStart;
     private ListView profilesList;
     private ArrayList<ProfileModel> profiles = new ArrayList<ProfileModel>();
     private String uid;
@@ -45,6 +45,7 @@ public class Profiles extends AppCompatActivity {
         btnlogout = findViewById(R.id.logout_btn);
         btnDeleteProfile = findViewById(R.id.btnDeleteProfile);
         btnEditProfile = findViewById(R.id.btnEditProfile);
+        btnStart = findViewById(R.id.btnStart);
         currentUser = mAuth.getCurrentUser();
         database = FirebaseDatabase.getInstance("https://power-app-53a05-default-rtdb.europe-west1.firebasedatabase.app");
         final ProfileAdapter adapter=new ProfileAdapter(this, 0, profiles);
@@ -72,6 +73,12 @@ public class Profiles extends AppCompatActivity {
                         }
                     });
 
+                    btnStart.setOnClickListener(new View.OnClickListener(){
+                        @Override
+                        public void onClick(View view){
+                            startApp();
+                        }
+                    });
                     btnDeleteProfile.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -173,5 +180,20 @@ public class Profiles extends AppCompatActivity {
         String weight = (String) profileData.get("weight");
         String height = (String) profileData.get("height");
         return new ProfileModel(name, surname, weight, height);
+    }
+
+    public void startApp(){
+        if(listViewPosition == -1){
+            Toast.makeText(this, "Please select an item", Toast.LENGTH_SHORT).show();
+        }
+        for (int i = 0; i < profiles.size(); i++) {
+            if (i == listViewPosition) {
+                Intent intent = new Intent(this, App.class);
+                intent.putExtra("Profile", profiles.get(i));
+                startActivity(intent);
+            }
+        }
+        listViewPosition = -1;
+
     }
 }

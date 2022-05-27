@@ -7,13 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.example.wpam_power_app.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -21,7 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginFragment extends Fragment {
     private FirebaseAuth mAuth;
-    private EditText login_email, login_password, reg_email, reg_password, pass_reapeted;
+    private EditText loginEmail, loginPassword, reg_email, reg_password, pass_reapeted;
     private Button loginbtn;
 
     public LoginFragment() {
@@ -34,8 +32,8 @@ public class LoginFragment extends Fragment {
         final View view = inflater.inflate(R.layout.fragment_login, container, false);
         // Inflate the layout for this fragment
         mAuth = FirebaseAuth.getInstance();
-        login_email = view.findViewById(R.id.et_email);
-        login_password = view.findViewById(R.id.et_password);
+        loginEmail = view.findViewById(R.id.et_email);
+        loginPassword = view.findViewById(R.id.et_password);
         loginbtn = view.findViewById(R.id.btn_login);
 
         loginbtn.setOnClickListener(new View.OnClickListener() {
@@ -48,13 +46,13 @@ public class LoginFragment extends Fragment {
     }
 
     private void login() {
-        String user = login_email.getText().toString().trim();
-        String pass = login_password.getText().toString().trim();
+        String user = loginEmail.getText().toString().trim();
+        String pass = loginPassword.getText().toString().trim();
         if(user.isEmpty()){
-            login_email.setError("Email cannot be empty");
+            loginEmail.setError("Email cannot be empty");
         }
         if(pass.isEmpty()){
-            login_password.setError("Password cannot be empty");
+            loginPassword.setError("Password cannot be empty");
         }
         else{
             mAuth.signInWithEmailAndPassword(user, pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
