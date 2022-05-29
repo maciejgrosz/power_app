@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -58,7 +59,6 @@ public class Profiles extends AppCompatActivity {
                     reference = database.getReference("users").child(uid);
                     add_new_profile_btn = (Button) findViewById(R.id.add_new_profile_btn);
 
-
                     btnlogout.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -97,7 +97,6 @@ public class Profiles extends AppCompatActivity {
                         public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                             listViewPosition = position;
                         }
-
                     });
 //                    Is it necessary?
                     reference.addChildEventListener(new ChildEventListener() {
