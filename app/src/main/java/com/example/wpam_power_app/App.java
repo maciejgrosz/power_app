@@ -82,8 +82,10 @@ public class App extends AppCompatActivity {
     }
 
     private void back() {
-        Intent intent = new Intent(this, Profiles.class);
-        startActivity(intent);
+//        Intent intent = new Intent(this, Profiles.class);
+//        startActivity(intent);
+        readData();
+
     }
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -135,12 +137,9 @@ public class App extends AppCompatActivity {
             for (BluetoothDevice device : pairedDevices) {
                 if (deviceName.equals(device.getName())) {
                     userDetails.setText("hc-05 is available");
-                    new App.ConnectBT().execute();
-
                 }
-
-
             }
+            new App.ConnectBT().execute();
         }
     }
     private class ConnectBT extends AsyncTask<Void, Void, Void> {
@@ -182,5 +181,31 @@ public class App extends AppCompatActivity {
             progress.dismiss();
         }
     }
+
+    private void readData()
+    {
+        if (btSocket != null) {
+            try { // Converting the string to bytes for transferring
+                convertStreamToStiring(btSocket.getInputStream());
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public String convertStreamToStiring(InputStream is) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        Integer i = 0;
+        for (int ch; (ch = is.read()) != -1; ) {
+            i++;
+            sb.append((char) ch);
+            if(i==3) {
+                break;
+            }
+        }
+        return sb.toString();
+    }
+
 
 }
