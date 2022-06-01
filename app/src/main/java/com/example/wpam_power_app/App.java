@@ -1,7 +1,5 @@
 package com.example.wpam_power_app;
 
-import static android.content.ContentValues.TAG;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -10,7 +8,6 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,22 +16,18 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Message;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 
 public class App extends AppCompatActivity {
-    private Button connectBtn, backBtn;
+    private Button connectBtn, backBtn, readBtn, getDataBtn;
     private TextView userDetails;
     String deviceName = "HC-05";
 
@@ -45,16 +38,20 @@ public class App extends AppCompatActivity {
     BluetoothSocket btSocket = null;
     private boolean isBtConnected = false;
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private ArrayList<String> data;
+//    public static Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app);
-
-
+        readBtn = findViewById(R.id.readBtn);
+        getDataBtn = findViewById(R.id.getDataBtn);
         connectBtn = findViewById(R.id.connectBtn);
         backBtn = findViewById(R.id.backBtn);
         userDetails = findViewById(R.id.userDetails);
+        ReadThread readThread = new ReadThread();
+//        context = App.this;
         ProfileModel Profile = (ProfileModel) getIntent().getSerializableExtra("Profile");
         setUserDetails(Profile);
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
@@ -72,6 +69,20 @@ public class App extends AppCompatActivity {
             public void onClick(View view) {
                 connect();
 
+
+            }
+        });
+        readBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                readData(readThread);
+
+            }
+        });
+        getDataBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                userDetails.setText(getData(readThread).get(0));
             }
         });
     }
@@ -82,10 +93,8 @@ public class App extends AppCompatActivity {
     }
 
     private void back() {
-//        Intent intent = new Intent(this, Profiles.class);
-//        startActivity(intent);
-        readData();
-
+        Intent intent = new Intent(this, Profiles.class);
+        startActivity(intent);
     }
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -139,11 +148,38 @@ public class App extends AppCompatActivity {
                     userDetails.setText("hc-05 is available");
                 }
             }
-            new App.ConnectBT().execute();
+            new ConnectBT().execute();
         }
     }
-    private class ConnectBT extends AsyncTask<Void, Void, Void> {
+
+
+    private void readData(ReadThread readThread)
+    {
+
+        readThread.start();
+    }
+
+    private ArrayList<String> getData(ReadThread readThread){
+
+        data = readThread.getData();
+//        readThread.shutDown();
+        return data;
+    }
+//    public static Context getContext(){
+//        return context;
+//    }
+
+    public class ConnectBT extends AsyncTask<Void, Void, Void> {
+        final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+        //    BluetoothSocket btSocket = null;
+        private ProgressDialog progress;
+        String address = "98:D3:71:F6:39:3C";
+        BluetoothAdapter myBluetooth = null;
+        private boolean isBtConnected = false;
+
+
         private boolean ConnectSuccess = true;
+
 
         @Override
         protected void onPreExecute() {
@@ -172,7 +208,6 @@ public class App extends AppCompatActivity {
 
             if (!ConnectSuccess) {
                 userDetails.setText("Connection Failed. Is it a SPP Bluetooth? Try again.");
-                finish();
             } else {
                 userDetails.setText("Connected");
                 isBtConnected = true;
@@ -180,32 +215,47 @@ public class App extends AppCompatActivity {
 
             progress.dismiss();
         }
+
     }
 
-    private void readData()
-    {
-        if (btSocket != null) {
-            try { // Converting the string to bytes for transferring
-                convertStreamToStiring(btSocket.getInputStream());
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public String convertStreamToStiring(InputStream is) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        Integer i = 0;
-        for (int ch; (ch = is.read()) != -1; ) {
-            i++;
-            sb.append((char) ch);
-            if(i==3) {
-                break;
+    public class ReadThread extends Thread{
+        public volatile boolean isShutingDown;
+        public volatile String test;
+        ArrayList<String> data = new ArrayList<String>( );
+        public void run(){
+            while(!isShutingDown){
+                if (btSocket != null) {
+                    try { // Converting the string to bytes for transferring
+                        data.add(convertStreamToString(btSocket.getInputStream()));
+                    }
+                    catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }else{
+                    data.add("997;");
+                    isShutingDown = true;
+                }
             }
         }
-        return sb.toString();
-    }
 
+        public String convertStreamToString(InputStream is) throws IOException {
+            StringBuilder sb = new StringBuilder();
+            int i = 0;
+            for (int ch; (ch = is.read()) != -1; ) {
+                i++;
+                sb.append((char) ch);
+                if(i==3){
+                    break;
+                }
+            }
+            return sb.toString();
+        }
+        public ArrayList<String> getData(){
+            return data;
+        }
+        public void shutDown(){
+            isShutingDown = true;
+        }
+    }
 
 }

@@ -2,13 +2,22 @@ package com.example.wpam_power_app;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
+import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
+import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RadioButton;
@@ -22,8 +31,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 public class Profiles extends AppCompatActivity {
     private FirebaseAuth mAuth;
@@ -36,12 +48,16 @@ public class Profiles extends AppCompatActivity {
     private FirebaseUser currentUser;
     private RadioButton isSelected;
     private int listViewPosition;
+    public static Context context;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profiles);
+//        ConnectBT connectBT = new ConnectBT();
         listViewPosition = -1;
+        context = Profiles.this;
         mAuth = FirebaseAuth.getInstance();
         btnlogout = findViewById(R.id.logout_btn);
         btnDeleteProfile = findViewById(R.id.btnDeleteProfile);
@@ -187,6 +203,7 @@ public class Profiles extends AppCompatActivity {
         }
         for (int i = 0; i < profiles.size(); i++) {
             if (i == listViewPosition) {
+//                connect();
                 Intent intent = new Intent(this, App.class);
                 intent.putExtra("Profile", profiles.get(i));
                 startActivity(intent);
@@ -195,4 +212,110 @@ public class Profiles extends AppCompatActivity {
         listViewPosition = -1;
 
     }
+//    private final BroadcastReceiver receiver = new BroadcastReceiver() {
+//        public void onReceive(Context context, Intent intent) {
+//            String action = intent.getAction();
+//            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+//                // Discovery has found a device. Get the BluetoothDevice
+//                // object and its info from the Intent.
+//                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+//                if (PackageManager.PERMISSION_GRANTED != ActivityCompat.checkSelfPermission(Profiles.this, Manifest.permission.BLUETOOTH_CONNECT)) {
+//                    return;
+//                }
+//                String deviceName = device.getName();
+//                String deviceHardwareAddress = device.getAddress(); // MAC address
+//            }
+//        }
+//    };
+//
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        unregisterReceiver(receiver);
+//    }
+
+//    private void connect() {
+////        Phone bluetooth address 3C:5A:B4:01:02:03
+////        D0:97:FE:CD:6B:7C - nieznane
+////        24:4B:81:BC:A8:12 - Galaxy s6
+//
+//// hc-05 address: 98D3:71:F6393C
+//// hc-05 pin: "1234"/ name: "HC-05"
+//        BluetoothManager bluetoothManager = null;
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+//            bluetoothManager = getSystemService(BluetoothManager.class);
+//        }
+//        BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
+//        if (bluetoothAdapter == null) {
+////            userDetails.setText("Device doesn't support Bluetooth");
+//        }
+//        if (!bluetoothAdapter.isEnabled()) {
+////            userDetails.setText("Turn on your bluetooth");
+//        }
+//
+//
+//        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+//
+//        if (pairedDevices.size() > 0) {
+//            // There are paired devices. Get the name and address of each paired device.
+//            for (BluetoothDevice device : pairedDevices) {
+//                if (deviceName.equals(device.getName())) {
+////                    userDetails.setText("hc-05 is available");
+//                }
+//            }
+//            new ConnectBT().execute();
+//        }
+//    }
+//    public static Context getContext(){
+//        return context;
+//    }
+
+//    public class ConnectBT extends AsyncTask<Void, Void, Void> {
+//        final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+//        //    BluetoothSocket btSocket = null;
+//        private ProgressDialog progress;
+//        String address = "98:D3:71:F6:39:3C";
+//        BluetoothAdapter myBluetooth = null;
+//        private boolean isBtConnected = false;
+//
+//
+//        private boolean ConnectSuccess = true;
+//
+//
+//        @Override
+//        protected void onPreExecute() {
+//            progress = ProgressDialog.show(Profiles.getContext(), "Connecting...", "Please Wait!!!");
+//        }
+//
+//        @Override
+//        protected Void doInBackground(Void... devices) {
+//            try {
+//                if (storage.btSocket == null || !isBtConnected) {
+//                    myBluetooth = BluetoothAdapter.getDefaultAdapter();
+//                    BluetoothDevice dispositivo = myBluetooth.getRemoteDevice(address);
+//                    storage.btSocket = dispositivo.createInsecureRfcommSocketToServiceRecord(myUUID);
+//                    BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
+//                    storage.btSocket.connect();
+//                }
+//            } catch (IOException e) {
+//                ConnectSuccess = false;
+//            }
+//
+//            return null;
+//        }
+//        @Override
+//        protected void onPostExecute (Void result) {
+//            super.onPostExecute(result);
+//
+//            if (!ConnectSuccess) {
+////            userDetails.setText("Connection Failed. Is it a SPP Bluetooth? Try again.");
+//            } else {
+////            userDetails.setText("Connected");
+//                isBtConnected = true;
+//            }
+//
+//            progress.dismiss();
+//        }
+//
+//    }
 }
