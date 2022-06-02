@@ -16,17 +16,13 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -92,7 +88,13 @@ public class App extends AppCompatActivity {
         getDataBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ArrayList<Double> powers = getData(readThread);
+                readThread.shutDown();
+                ArrayList<Double> powers = readThread.getPowers();
+                ArrayList<Double> velocities= readThread.getVelocities();
+                ArrayList<Double> accelerations = readThread.getAccelerations();
+                ArrayList<Double> shifts = readThread.getShifts();
+                ArrayList<Integer> raw = readThread.getRaw();
+                Double a = powers.get(0);
             }
         });
     }
@@ -169,15 +171,6 @@ public class App extends AppCompatActivity {
         readThread.start();
     }
 
-    private ArrayList<Double> getData(ReadThread readThread){
-        readThread.shutDown();
-        data = readThread.getPowers();
-        return data;
-    }
-//    public static Context getContext(){
-//        return context;
-//    }
-
     public class ConnectBT extends AsyncTask<Void, Void, Void> {
         final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
         //    BluetoothSocket btSocket = null;
@@ -229,14 +222,22 @@ public class App extends AppCompatActivity {
 
     public class ReadThread extends Thread{
         public volatile boolean isShutingDown;
-        ArrayList<String> times = new ArrayList<>(3);
-        ArrayList<String> encoder = new ArrayList<>(3);
+        ArrayList<Double> times = new ArrayList<>(3);
         ArrayList<Double> powers = new ArrayList<>();
         ArrayList<Double> velocities = new ArrayList<>();
         ArrayList<Double> accelerations = new ArrayList<>();
         ArrayList<Double> shifts = new ArrayList<>();
-        int i=0;
-        int tc = 0;
+        ArrayList<Integer> raw = new ArrayList<>();
+
+        ProfileModel Profile = (ProfileModel) getIntent().getSerializableExtra("Profile");
+        int w = Integer.parseInt(Profile.getWeight());
+        int h = Integer.parseInt(Profile.getHeight());
+        int wBarbell = 100; // TODO have to be passed from text box
+        double wSum = 7.4484 + 0.76694 * w - 0.05192 * h + wBarbell;
+        double A = J + (wSum * Math.pow(r, 2));
+        double B = wSum * g * r;
+        double fi0=0, fi1=0, fi2=0, t0=0, t1=0, ts=0.01, tc=0, v=0, v1=0, a1=0, a=0;
+        double fiPrim, fiBis, pLift, shift;
 
         public void run(){
             while(!isShutingDown){
@@ -244,26 +245,39 @@ public class App extends AppCompatActivity {
                     try { // Converting the string to bytes for transferring
                         dataString = convertStreamToString(btSocket.getInputStream());
                         String[] pack = dataString.split("-");
-                        encoder.add(pack[0]);
-
-                        String time = pack[1].replaceAll("\\s+","");
-                        times.add(time);
-                        if(encoder.size() == 3){
-                            powers.add(processingData(encoder, times, tc).getpLift());
-                            velocities.add(processingData(encoder, times, tc).getV());
-                            accelerations.add(processingData(encoder, times, tc).getA());
-                            shifts.add(processingData(encoder, times, tc).getShift());
-
-                            encoder.clear();
-                            times.clear();
+                        if(pack.length <2 | pack[0].equals("")){
+                            continue;
                         }
-                        i++;
 
 
-//                        if(measurements.length == 6) {
-//                            measurements = new String[measurements.length];
-//
-//                        }
+                        fi2 = fi1;
+                        fi1 = fi0;
+                        fi0 = calculateFi(Integer.parseInt(pack[0]));
+
+                        t1 = t0;
+                        t0 = Double.parseDouble(pack[1].replaceAll("\\s+", ""))/1000;
+                        ts = t0 - t1;
+                        if(ts>1 | ts==0 | ts < 0.0001){
+                            ts=0.01;
+                        }
+                        v1 = v;
+                        v = (fi0 - fi1) * r/ts;
+
+                        a1 = a;
+                        a = (v-v1)/ts;
+                        tc = tc + ts;
+
+                        fiPrim = (fi0 - fi1)/ts;
+                        fiBis = (fi0 - 2*fi1 + fi2)/(Math.pow(ts, 2));
+                        pLift = A * fiPrim * fiBis + B * fiPrim + C * fiPrim;
+                        shift = fi0 * r;
+                        powers.add(pLift);
+                        velocities.add(v);
+                        shifts.add(shift);
+                        accelerations.add(a);
+                        times.add(tc);
+                        raw.add(Integer.parseInt(pack[0]));
+
                     }
                     catch (IOException e) {
                         e.printStackTrace();
@@ -303,6 +317,14 @@ public class App extends AppCompatActivity {
 
         public void shutDown(){
             isShutingDown = true;
+        }
+
+        public ArrayList<Integer> getRaw() {
+            return raw;
+        }
+
+        private float calculateFi(int a){
+            return (float) (((a-1000)/200) * 3.14);
         }
     }
 
