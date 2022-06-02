@@ -243,9 +243,11 @@ public class App extends AppCompatActivity {
                 if (btSocket != null) {
                     try { // Converting the string to bytes for transferring
                         dataString = convertStreamToString(btSocket.getInputStream());
+                        String[] pack = dataString.split("-");
+                        encoder.add(pack[0]);
 
-                        encoder.add(dataString.split("-")[0]);
-                        times.add(dataString.split("-")[1].replaceAll("\\s+",""));
+                        String time = pack[1].replaceAll("\\s+","");
+                        times.add(time);
                         if(encoder.size() == 3){
                             powers.add(processingData(encoder, times, tc).getpLift());
                             velocities.add(processingData(encoder, times, tc).getV());
