@@ -16,13 +16,17 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -30,15 +34,20 @@ public class App extends AppCompatActivity {
     private Button connectBtn, backBtn, readBtn, getDataBtn;
     private TextView userDetails;
     String deviceName = "HC-05";
-
     String address = "98:D3:71:F6:39:3C";
-
+    String dataString;
+    double J = 0.000193152;
+    double r = 0.0625;
+    double g = 9.81;
+    double fLeash = 150.0/1000 * g;
+    double C = fLeash * r;
     private ProgressDialog progress;
     BluetoothAdapter myBluetooth = null;
     BluetoothSocket btSocket = null;
     private boolean isBtConnected = false;
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    private ArrayList<String> data;
+    private ArrayList<Double> data;
+
 //    public static Context context;
 
     @Override
@@ -51,8 +60,9 @@ public class App extends AppCompatActivity {
         backBtn = findViewById(R.id.backBtn);
         userDetails = findViewById(R.id.userDetails);
         ReadThread readThread = new ReadThread();
-//        context = App.this;
         ProfileModel Profile = (ProfileModel) getIntent().getSerializableExtra("Profile");
+
+//        context = App.this;
         setUserDetails(Profile);
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(receiver, filter);
@@ -82,7 +92,7 @@ public class App extends AppCompatActivity {
         getDataBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                userDetails.setText(getData(readThread).get(0));
+                ArrayList<Double> powers = getData(readThread);
             }
         });
     }
@@ -159,10 +169,9 @@ public class App extends AppCompatActivity {
         readThread.start();
     }
 
-    private ArrayList<String> getData(ReadThread readThread){
-
-        data = readThread.getData();
-//        readThread.shutDown();
+    private ArrayList<Double> getData(ReadThread readThread){
+        readThread.shutDown();
+        data = readThread.getPowers();
         return data;
     }
 //    public static Context getContext(){
@@ -220,19 +229,44 @@ public class App extends AppCompatActivity {
 
     public class ReadThread extends Thread{
         public volatile boolean isShutingDown;
-        public volatile String test;
-        ArrayList<String> data = new ArrayList<String>( );
+        ArrayList<String> times = new ArrayList<>(3);
+        ArrayList<String> encoder = new ArrayList<>(3);
+        ArrayList<Double> powers = new ArrayList<>();
+        ArrayList<Double> velocities = new ArrayList<>();
+        ArrayList<Double> accelerations = new ArrayList<>();
+        ArrayList<Double> shifts = new ArrayList<>();
+        int i=0;
+        int tc = 0;
+
         public void run(){
             while(!isShutingDown){
                 if (btSocket != null) {
                     try { // Converting the string to bytes for transferring
-                        data.add(convertStreamToString(btSocket.getInputStream()));
+                        dataString = convertStreamToString(btSocket.getInputStream());
+
+                        encoder.add(dataString.split("-")[0]);
+                        times.add(dataString.split("-")[1].replaceAll("\\s+",""));
+                        if(encoder.size() == 3){
+                            powers.add(processingData(encoder, times, tc).getpLift());
+                            velocities.add(processingData(encoder, times, tc).getV());
+                            accelerations.add(processingData(encoder, times, tc).getA());
+                            shifts.add(processingData(encoder, times, tc).getShift());
+
+                            encoder.clear();
+                            times.clear();
+                        }
+                        i++;
+
+
+//                        if(measurements.length == 6) {
+//                            measurements = new String[measurements.length];
+//
+//                        }
                     }
                     catch (IOException e) {
                         e.printStackTrace();
                     }
                 }else{
-                    data.add("997;");
                     isShutingDown = true;
                 }
             }
@@ -240,22 +274,72 @@ public class App extends AppCompatActivity {
 
         public String convertStreamToString(InputStream is) throws IOException {
             StringBuilder sb = new StringBuilder();
-            int i = 0;
             for (int ch; (ch = is.read()) != -1; ) {
-                i++;
                 sb.append((char) ch);
-                if(i==3){
+                if(ch == '\n'){
                     break;
                 }
             }
             return sb.toString();
         }
-        public ArrayList<String> getData(){
-            return data;
+
+        public ArrayList<Double> getPowers() {
+            return powers;
         }
+
+        public ArrayList<Double> getVelocities() {
+            return velocities;
+        }
+
+        public ArrayList<Double> getAccelerations() {
+            return accelerations;
+        }
+
+        public ArrayList<Double> getShifts() {
+            return shifts;
+        }
+
         public void shutDown(){
             isShutingDown = true;
         }
+    }
+
+    private DataModel processingData(ArrayList<String> encoder,ArrayList<String> times, double tc ){
+        ProfileModel Profile = (ProfileModel) getIntent().getSerializableExtra("Profile");
+
+        int w = Integer.parseInt(Profile.getWeight());
+        int h = Integer.parseInt(Profile.getHeight());
+        int wBarbell = 100; // TODO have to be passed from text box
+        double wSum = 7.4484 + 0.76694 * w - 0.05192 * h + wBarbell;
+        double A = J + (wSum * Math.pow(r, 2));
+        double B = wSum * g * r;
+        double fi0 = calculateFi(Integer.parseInt(encoder.get(0)));
+        double fi1 = calculateFi(Integer.parseInt(encoder.get(1)));
+        double fi2 = calculateFi(Integer.parseInt(encoder.get(2)));
+
+        double t0 = Integer.parseInt(times.get(0))/1000.0;
+        double t1 = Integer.parseInt(times.get(1))/1000.0;
+        double t2 = Integer.parseInt(times.get(2))/1000.0;
+
+        double ts0 = t1 - t0;
+
+        if(ts0>1 | ts0==0 | ts0 < 0.0001) ts0 = 0.01;
+
+        tc = tc + ts0;
+
+        double v0 = (fi1 - fi0)/ts0;
+        double v1 = (fi2 - fi1)/ts0;
+
+        double a = (v1 - v0)/ts0; // could be a problem with ts1
+        double fiPrim = (fi2 - fi1)/ts0;
+        double fiBis = (fi2 - 2 * fi1 + fi0)/(Math.pow(ts0, 2));
+        double pLift = A * fiPrim * fiBis + B * fiPrim + C *fiPrim;
+        double shift = fi2 * r;
+        return new DataModel(v1, a, pLift, tc, shift);
+    }
+
+    private float calculateFi(int a){
+        return (float) (((a-1000)/200) * 3.14);
     }
 
 }
