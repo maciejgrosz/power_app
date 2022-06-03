@@ -22,6 +22,8 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
@@ -39,10 +41,11 @@ public class App extends AppCompatActivity {
     double C = fLeash * r;
     private ProgressDialog progress;
     BluetoothAdapter myBluetooth = null;
-    BluetoothSocket btSocket = null;
     private boolean isBtConnected = false;
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private ArrayList<Double> data;
+    BluetoothSocket btSocket = null;
+
 
 //    public static Context context;
 
@@ -73,7 +76,7 @@ public class App extends AppCompatActivity {
         connectBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                connect();
+//                connect();
 
 
             }
@@ -131,38 +134,38 @@ public class App extends AppCompatActivity {
         unregisterReceiver(receiver);
     }
 
-    private void connect() {
-//        Phone bluetooth address 3C:5A:B4:01:02:03
-//        D0:97:FE:CD:6B:7C - nieznane
-//        24:4B:81:BC:A8:12 - Galaxy s6
-
-// hc-05 address: 98D3:71:F6393C
-// hc-05 pin: "1234"/ name: "HC-05"
-        BluetoothManager bluetoothManager = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            bluetoothManager = getSystemService(BluetoothManager.class);
-        }
-        BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
-        if (bluetoothAdapter == null) {
-            userDetails.setText("Device doesn't support Bluetooth");
-        }
-        if (!bluetoothAdapter.isEnabled()) {
-            userDetails.setText("Turn on your bluetooth");
-        }
-
-
-        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
-
-        if (pairedDevices.size() > 0) {
-            // There are paired devices. Get the name and address of each paired device.
-            for (BluetoothDevice device : pairedDevices) {
-                if (deviceName.equals(device.getName())) {
-                    userDetails.setText("hc-05 is available");
-                }
-            }
-            new ConnectBT().execute();
-        }
-    }
+//    private void connect() {
+////        Phone bluetooth address 3C:5A:B4:01:02:03
+////        D0:97:FE:CD:6B:7C - nieznane
+////        24:4B:81:BC:A8:12 - Galaxy s6
+//
+//// hc-05 address: 98D3:71:F6393C
+//// hc-05 pin: "1234"/ name: "HC-05"
+//        BluetoothManager bluetoothManager = null;
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+//            bluetoothManager = getSystemService(BluetoothManager.class);
+//        }
+//        BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
+//        if (bluetoothAdapter == null) {
+//            userDetails.setText("Device doesn't support Bluetooth");
+//        }
+//        if (!bluetoothAdapter.isEnabled()) {
+//            userDetails.setText("Turn on your bluetooth");
+//        }
+//
+//
+//        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+//
+//        if (pairedDevices.size() > 0) {
+//            // There are paired devices. Get the name and address of each paired device.
+//            for (BluetoothDevice device : pairedDevices) {
+//                if (deviceName.equals(device.getName())) {
+//                    userDetails.setText("hc-05 is available");
+//                }
+//            }
+//            new ConnectBT().execute();
+//        }
+//    }
 
 
     private void readData(ReadThread readThread)
@@ -222,12 +225,15 @@ public class App extends AppCompatActivity {
 
     public class ReadThread extends Thread{
         public volatile boolean isShutingDown;
+        BluetoothSocket btSocket = null;
+
         ArrayList<Double> times = new ArrayList<>(3);
         ArrayList<Double> powers = new ArrayList<>();
         ArrayList<Double> velocities = new ArrayList<>();
         ArrayList<Double> accelerations = new ArrayList<>();
         ArrayList<Double> shifts = new ArrayList<>();
         ArrayList<Integer> raw = new ArrayList<>();
+
 
         ProfileModel Profile = (ProfileModel) getIntent().getSerializableExtra("Profile");
         int w = Integer.parseInt(Profile.getWeight());
@@ -239,12 +245,25 @@ public class App extends AppCompatActivity {
         double fi0=0, fi1=0, fi2=0, t0=0, t1=0, ts=0.01, tc=0, v=0, v1=0, a1=0, a=0;
         double fiPrim, fiBis, pLift, shift;
 
+
         public void run(){
+
+            try {
+                myBluetooth = BluetoothAdapter.getDefaultAdapter();
+                BluetoothDevice dispositivo = myBluetooth.getRemoteDevice(address);
+                btSocket = dispositivo.createInsecureRfcommSocketToServiceRecord(myUUID);
+                BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
+                btSocket.connect();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             while(!isShutingDown){
                 if (btSocket != null) {
-                    try { // Converting the string to bytes for transferring
+                    try {
+                        btSocket.getOutputStream().write(1);
                         dataString = convertStreamToString(btSocket.getInputStream());
                         String[] pack = dataString.split("-");
+
                         if(pack.length <2 | pack[0].equals("")){
                             continue;
                         }
@@ -286,6 +305,12 @@ public class App extends AppCompatActivity {
                     isShutingDown = true;
                 }
             }
+            try {
+                assert btSocket != null;
+                btSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         public String convertStreamToString(InputStream is) throws IOException {
@@ -326,6 +351,7 @@ public class App extends AppCompatActivity {
         private float calculateFi(int a){
             return (float) (((a-1000)/200) * 3.14);
         }
+
     }
 
     private DataModel processingData(ArrayList<String> encoder,ArrayList<String> times, double tc ){
