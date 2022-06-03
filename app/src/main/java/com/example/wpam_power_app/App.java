@@ -92,12 +92,12 @@ public class App extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 readThread.shutDown();
-                ArrayList<Double> powers = readThread.getPowers();
-                ArrayList<Double> velocities= readThread.getVelocities();
-                ArrayList<Double> accelerations = readThread.getAccelerations();
-                ArrayList<Double> shifts = readThread.getShifts();
+//                ArrayList<Double> powers = readThread.getPowers();
+//                ArrayList<Double> velocities= readThread.getVelocities();
+//                ArrayList<Double> accelerations = readThread.getAccelerations();
+//                ArrayList<Double> shifts = readThread.getShifts();
                 ArrayList<Integer> raw = readThread.getRaw();
-                Double a = powers.get(0);
+                int a = raw.get(0);
             }
         });
     }
@@ -260,7 +260,6 @@ public class App extends AppCompatActivity {
             while(!isShutingDown){
                 if (btSocket != null) {
                     try {
-                        btSocket.getOutputStream().write(1);
                         dataString = convertStreamToString(btSocket.getInputStream());
                         String[] pack = dataString.split("-");
 
@@ -269,32 +268,32 @@ public class App extends AppCompatActivity {
                         }
 
 
-                        fi2 = fi1;
-                        fi1 = fi0;
-                        fi0 = calculateFi(Integer.parseInt(pack[0]));
-
-                        t1 = t0;
-                        t0 = Double.parseDouble(pack[1].replaceAll("\\s+", ""))/1000;
-                        ts = t0 - t1;
-                        if(ts>1 | ts==0 | ts < 0.0001){
-                            ts=0.01;
-                        }
-                        v1 = v;
-                        v = (fi0 - fi1) * r/ts;
-
-                        a1 = a;
-                        a = (v-v1)/ts;
-                        tc = tc + ts;
-
-                        fiPrim = (fi0 - fi1)/ts;
-                        fiBis = (fi0 - 2*fi1 + fi2)/(Math.pow(ts, 2));
-                        pLift = A * fiPrim * fiBis + B * fiPrim + C * fiPrim;
-                        shift = fi0 * r;
-                        powers.add(pLift);
-                        velocities.add(v);
-                        shifts.add(shift);
-                        accelerations.add(a);
-                        times.add(tc);
+//                        fi2 = fi1;
+//                        fi1 = fi0;
+//                        fi0 = calculateFi(Integer.parseInt(pack[0]));
+//
+//                        t1 = t0;
+//                        t0 = Double.parseDouble(pack[1].replaceAll("\\s+", ""))/1000;
+//                        ts = t0 - t1;
+//                        if(ts>1 | ts==0 | ts < 0.0001){
+//                            ts=0.01;
+//                        }
+//                        v1 = v;
+//                        v = (fi0 - fi1) * r/ts;
+//
+//                        a1 = a;
+//                        a = (v-v1)/ts;
+//                        tc = tc + ts;
+//
+//                        fiPrim = (fi0 - fi1)/ts;
+//                        fiBis = (fi0 - 2*fi1 + fi2)/(Math.pow(ts, 2));
+//                        pLift = A * fiPrim * fiBis + B * fiPrim + C * fiPrim;
+//                        shift = fi0 * r;
+//                        powers.add(pLift);
+//                        velocities.add(v);
+//                        shifts.add(shift);
+//                        accelerations.add(a);
+//                        times.add(tc);
                         raw.add(Integer.parseInt(pack[0]));
 
                     }
@@ -391,5 +390,6 @@ public class App extends AppCompatActivity {
     private float calculateFi(int a){
         return (float) (((a-1000)/200) * 3.14);
     }
+
 
 }
