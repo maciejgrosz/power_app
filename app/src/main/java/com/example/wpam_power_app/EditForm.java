@@ -29,9 +29,9 @@ public class EditForm extends AppCompatActivity {
         setContentView(R.layout.activity_form);
         Button cancelFormBtn = findViewById(R.id.cancel_form_btn);
         Button editFormBtn = findViewById(R.id.btnSaveForm);
-        editFormBtn.setText("Edit profile");
+        editFormBtn.setText("Edit");
         ProfileModel Profile = (ProfileModel) getIntent().getSerializableExtra("Profile");
-        int id = getIntent().getIntExtra("id",0);
+        String id = Profile.getId();
         name = Profile.getName();
         surname = Profile.getSurname();
         weight = Profile.getWeight();
@@ -61,7 +61,7 @@ public class EditForm extends AppCompatActivity {
                 String new_weight = mWeight.getText().toString();
                 String new_height = mHeight.getText().toString();
                 String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                ProfileModel profile = new ProfileModel(new_name, new_surname, new_weight, new_height);
+                ProfileModel profile = new ProfileModel(new_name, new_surname, new_weight, new_height, id);
                 updateFormToDB(uid, profile, id);
             }
         });
@@ -73,9 +73,9 @@ public class EditForm extends AppCompatActivity {
 
     }
 
-    public void updateFormToDB(String userID, ProfileModel profile, int id){
+    public void updateFormToDB(String userID, ProfileModel profile, String id){
 
-        root.child("users").child(userID).child(String.format("Profile_%d",id)).setValue(profile);
+        root.child("users").child(userID).child(id).setValue(profile);
         Intent intent = new Intent(this, Profiles.class);
         startActivity(intent);
     }

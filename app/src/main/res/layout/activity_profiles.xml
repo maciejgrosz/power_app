@@ -20,67 +20,104 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/add_new_profile_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minWidth="200dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:text="@string/new_profile"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/guideline15"
+        app:layout_constraintDimensionRatio="7:4"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.763"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toEndOf="@id/logout_btn"
+        app:layout_constraintTop_toTopOf="@+id/guideline9" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/logout_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minWidth="92dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:text="@string/logout"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/guideline15"
+        app:layout_constraintDimensionRatio="7:4"
         app:layout_constraintEnd_toStartOf="@+id/add_new_profile_btn"
-        app:layout_constraintHorizontal_bias="0.632"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline9" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnDeleteProfile"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:text="@string/Delete"
-        android:minWidth="92dp"
-        app:layout_constraintBottom_toTopOf="@+id/logout_btn"
+        app:layout_constraintBottom_toBottomOf="@id/guideline8"
+        app:layout_constraintDimensionRatio="6:4"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.133"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btnEditProfile"
+        app:layout_constraintTop_toTopOf="@+id/guideline7" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnEditProfile"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:text="Edit"
-        app:layout_constraintBottom_toTopOf="@+id/add_new_profile_btn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.845"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@id/guideline8"
+        app:layout_constraintDimensionRatio="6:4"
+        app:layout_constraintEnd_toStartOf="@+id/btnDeleteProfile"
+
+
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/btnStart"
+        app:layout_constraintTop_toTopOf="@id/guideline7" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnStart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:text="Start"
-        app:layout_constraintBottom_toTopOf="@+id/add_new_profile_btn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@id/guideline8"
+        app:layout_constraintDimensionRatio="6:4"
+        app:layout_constraintEnd_toStartOf="@+id/btnEditProfile"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/guideline7" />
 
     <ListView
         android:id="@+id/profile_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:choiceMode="singleChoice"
         android:listSelector="@android:color/darker_gray"
+        app:layout_constraintDimensionRatio="9:10"
+        app:layout_constraintBottom_toTopOf="@+id/guideline7"
         app:layout_constraintTop_toTopOf="parent"
-        android:paddingTop="10dp"
-        android:paddingBottom="100dp"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.70" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.83" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.85" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline15"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.98" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

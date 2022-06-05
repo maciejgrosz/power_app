@@ -18,6 +18,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class Form extends AppCompatActivity {
     private EditText mName, mSurname, mWeight, mHeight;
     private FirebaseDatabase db = FirebaseDatabase.getInstance("https://power-app-53a05-default-rtdb.europe-west1.firebasedatabase.app/");
@@ -29,7 +32,6 @@ public class Form extends AppCompatActivity {
         setContentView(R.layout.activity_form);
         Button cancel_form_btn = findViewById(R.id.cancel_form_btn);
         Button saveFormBtn = findViewById(R.id.btnSaveForm);
-        int id = getIntent().getIntExtra("id",999);
 
         mName = findViewById(R.id.etFirstName);
         mSurname = findViewById(R.id.etLastName);
@@ -51,7 +53,10 @@ public class Form extends AppCompatActivity {
                 String weight = mWeight.getText().toString();
                 String height = mHeight.getText().toString();
                 String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                ProfileModel profile = new ProfileModel(name, surname, weight, height);
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                Date date = new Date();
+                String id = formatter.format(date).replaceAll("[^0-9]", "");
+                ProfileModel profile = new ProfileModel(name, surname, weight, height, id);
                 saveFormToDB(uid, profile, id);
             }
         });
@@ -63,8 +68,8 @@ public class Form extends AppCompatActivity {
 
     }
 
-    public void saveFormToDB(String userID, ProfileModel profile, int id){
-        root.child("users").child(userID).child(String.format("Profile_%d", id)).setValue(profile);
+    public void saveFormToDB(String userID, ProfileModel profile, String id){
+        root.child("users").child(userID).child(id).setValue(profile);
         Intent intent = new Intent(this, Profiles.class);
         startActivity(intent);
 

@@ -12,75 +12,32 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:text="@string/formName"
-        android:textSize="20sp" />
+        android:textSize="15sp" />
 
     <TextView
         android:id="@+id/textViewSurname"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/textViewName"
-        android:paddingTop="10dp"
+        android:paddingTop="5dp"
         android:text="@string/formSurname"
-        android:textSize="20sp" />
+        android:textSize="15sp" />
 
     <TextView
         android:id="@+id/textViewWeight"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/textViewSurname"
-        android:paddingTop="10dp"
+        android:paddingTop="5dp"
         android:text="@string/formWeight"
-        android:textSize="20sp" />
+        android:textSize="15sp" />
     <TextView
         android:id="@+id/textViewHeight"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/textViewWeight"
-        android:paddingTop="10dp"
+        android:paddingTop="5dp"
         android:text="@string/formHeight"
-        android:textSize="20sp"/>
-
-<!--    <RadioButton-->
-<!--        android:id="@+id/radio"-->
-<!--        android:layout_alignEnd="@+id/textViewHeight"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content" />-->
-    <!--    <Button-->
-<!--        android:id="@+id/buttonDelete"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_below = "@+id/textViewHeight"-->
-<!--        android:background="#FF0000"-->
-<!--        android:layout_marginTop="10dp"-->
-<!--        android:text="@string/formDelete"-->
-<!--        android:minHeight="30dp"-->
-<!--        android:minWidth="70dp"/>-->
-<!--    <Button-->
-<!--        android:id="@+id/buttonStart"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_below = "@+id/textViewHeight"-->
-<!--        android:background="#FF0000"-->
-<!--        android:layout_toEndOf="@+id/buttonDelete"-->
-<!--        android:layout_marginStart="65dp"-->
-<!--        android:layout_marginTop="10dp"-->
-<!--        android:text="@string/formStart"-->
-<!--        android:minHeight="30dp"-->
-<!--        android:minWidth="70dp"/>-->
-
-<!--    <Button-->
-<!--        android:id="@+id/buttonEdit"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_below="@+id/textViewHeight"-->
-<!--        android:layout_toEndOf="@+id/buttonStart"-->
-<!--        android:background="#FF0000"-->
-<!--        android:layout_marginStart="65dp"-->
-<!--        android:layout_marginTop="10dp"-->
-<!--        android:minHeight="30dp"-->
-<!--        android:minWidth="70dp"-->
-<!--        android:text="@string/formEdit" />-->
-
-
+        android:textSize="15sp"/>
 
 </RelativeLayout>

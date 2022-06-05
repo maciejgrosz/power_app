@@ -7,12 +7,14 @@ public class ProfileModel implements Serializable {
     String surname;
     String weight;
     String height;
+    String id;
 
-    public ProfileModel(String name, String surname, String weight, String height) {
+    public ProfileModel(String name, String surname, String weight, String height, String id) {
         this.name=name;
         this.surname=surname;
         this.weight=weight;
         this.height=height;
+        this.id = id;
 
     }
 
@@ -30,5 +32,9 @@ public class ProfileModel implements Serializable {
 
     public String getHeight() {
         return height;
+    }
+
+    public String getId() {
+        return id;
     }
 }
