@@ -117,11 +117,13 @@ public class App extends AppCompatActivity {
     }
 
     private void start(ReadThread readThread){
-        if(!readThread.isAlive() && isBtConnected) {
+        if(!readThread.isAlive()) {
             readThread.start();
             Toast.makeText(getBaseContext(), "Start!", Toast.LENGTH_SHORT).show();
-        }else if(!isBtConnected){
+        }
+        else if(!isBtConnected){
             Toast.makeText(getBaseContext(), "Check bt connections", Toast.LENGTH_SHORT).show();
+
         }
         startBtn.setEnabled(false);
         stopBtn.setEnabled(true);
@@ -131,12 +133,11 @@ public class App extends AppCompatActivity {
     private void stop(ReadThread readThread){
         ArrayList<Integer> raw = readThread.getRaw();
         readThread.stopThread();
-//                ArrayList<Double> powers = readThread.getPowers();
-//                ArrayList<Double> velocities= readThread.getVelocities();
-//                ArrayList<Double> accelerations = readThread.getAccelerations();
-//                ArrayList<Double> shifts = readThread.getShifts();
+        ArrayList<Double> powers = readThread.getPowers();
+        ArrayList<Double> velocities= readThread.getVelocities();
+        ArrayList<Double> accelerations = readThread.getAccelerations();
+        ArrayList<Double> shifts = readThread.getShifts();
         fakeGenerator();
-//        int a = raw.get(0);
         saveBtn.setEnabled(true);
         startBtn.setEnabled(true);
         stopBtn.setEnabled(false);
@@ -213,7 +214,6 @@ public class App extends AppCompatActivity {
             } catch (IOException e) {
                 ConnectSuccess = false;
             }
-
             return null;
         }
         @Override
@@ -226,10 +226,8 @@ public class App extends AppCompatActivity {
                 statusBt.setText("Connected");
                 isBtConnected = true;
             }
-
             progress.dismiss();
         }
-
     }
 
     public class ReadThread extends Thread{
@@ -243,7 +241,7 @@ public class App extends AppCompatActivity {
 
 
         private Thread worker;
-        private final AtomicBoolean running = new AtomicBoolean(false);
+        private final AtomicBoolean running = new AtomicBoolean(true);
         ProfileModel Profile = (ProfileModel) getIntent().getSerializableExtra("Profile");
         int w = Integer.parseInt(Profile.getWeight());
         int h = Integer.parseInt(Profile.getHeight());
@@ -261,11 +259,13 @@ public class App extends AppCompatActivity {
 
         public void stopThread() {
             running.set(false);
+
         }
 
         public void run(){
+
             while(running.get()){
-                if (btSocket != null || isBtConnected) {
+                if (btSocket != null) {
                     try {
                         dataString = convertStreamToString(btSocket.getInputStream());
                         String[] pack = dataString.split("-");
@@ -323,12 +323,14 @@ public class App extends AppCompatActivity {
         }
 
         private double[] calculateValues(String[] pack){
+            String encoder = pack[0].replaceAll("[^0-9]", "");
+            String time = pack[1].replaceAll("[^0-9]", "");
             fi2 = fi1;
             fi1 = fi0;
-            fi0 = calculateFi(Integer.parseInt(pack[0]));
+            fi0 = calculateFi(Integer.parseInt(encoder));
 
             t1 = t0;
-            t0 = Double.parseDouble(pack[1].replaceAll("\\s+", ""))/1000;
+            t0 = Double.parseDouble(time)/1000;
             ts = t0 - t1;
             if(ts>1 | ts==0 | ts < 0.0001){
                 ts=0.01;

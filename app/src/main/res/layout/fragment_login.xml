@@ -61,8 +61,8 @@
         android:layout_marginTop="15dp"
         android:layout_marginRight="20dp"
         android:background="@drawable/btn_custom"
-        android:textColor="@android:color/white"
-        android:text="@string/login" />
+        android:text="@string/login"
+        android:textColor="@android:color/white" />
 
     <ImageView
         android:layout_width="30dp"
